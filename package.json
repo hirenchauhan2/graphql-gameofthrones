@@ -1,0 +1,19 @@
+{
+  "name": "graphql-gameofthrones",
+  "version": "1.0.0",
+  "description": "Fetch HBO's Game of Thrones data using HBO viewers guide api using GraphQL.",
+  "main": "server.js",
+  "repository": "https://github.com/slightlytrue/graphql-gameofthrones.git",
+  "author": "Hiren Chauhan <hiren.maheshwari366@gmail.com>",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.16.2",
+    "express-graphql": "^0.6.11",
+    "graphql": "^0.12.3",
+    "node-fetch": "^1.7.3"
+  }
+}
