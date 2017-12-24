@@ -7,6 +7,8 @@ const {
   GraphQLList
 } = require('graphql')
 
+const DataLoader = require('dataloader')
+
 const {
   getSeasons,
   getFeaturedCharacters,
@@ -15,6 +17,11 @@ const {
 } = require('./got-api')
 
 const { stripHTMLTags } = require('./util')
+
+const seasonsLoader = new DataLoader(keys => getSeasons)
+const featuredCharsLoader = new DataLoader(keys => Promise.all(keys.map(getFeaturedCharacters)))
+const characterLoader = new DataLoader(keys => Promise.all(keys.map(getCharacter)))
+const characterListLoader = new DataLoader(keys => getCharactersList)
 
 // Season Type
 const SeasonType = new GraphQLObjectType({
@@ -48,7 +55,7 @@ const EpisodeType = new GraphQLObjectType({
     featuredCharacters: {
       type: new GraphQLList(FeaturedCharacterType),
       resolve: async data => {
-        return await getFeaturedCharacters(data.id)
+        return await featuredCharsLoader.load(data.id)
       }
     }
   })
@@ -79,22 +86,25 @@ const FeaturedCharacterType = new GraphQLObjectType({
   })
 })
 
+const CharacterIntroType = new GraphQLObjectType({
+  name: 'CharacterIntro',
+  fields: () => ({
+    sub_title: { type: GraphQLString },
+    quote: { type: GraphQLString },
+    by: { type: GraphQLString }
+  })
+})
+
 // Character full info
 const CharacterType = new GraphQLObjectType({
   name: 'Character',
   description: 'Character details',
   fields: () => ({
+    id: { type: GraphQLInt },
     firstname: { type: GraphQLString },
     lastname: { type: GraphQLString },
     intro: {
-      type: new GraphQLObjectType({
-        name: 'CharacterIntro',
-        fields: () => ({
-          sub_title: { type: GraphQLString },
-          quote: { type: GraphQLString },
-          by: { type: GraphQLString }
-        })
-      })
+      type: CharacterIntroType
     },
     bio: { type: GraphQLString },
     img: { type: GraphQLString },
@@ -134,7 +144,7 @@ module.exports = new GraphQLSchema({
           if (!id) {
             return await getSeasons()[0]
           }
-          return await getSeasons(id)
+          return await seasonsLoader.load(id)
         }
       },
       characterList: {
@@ -146,7 +156,7 @@ module.exports = new GraphQLSchema({
         args: {
           id: { type: GraphQLInt }
         },
-        resolve: async (root, { id }) => await getCharacter(id)
+        resolve: async (root, { id }) => await characterLoader.load(id)
       }
     })
   })

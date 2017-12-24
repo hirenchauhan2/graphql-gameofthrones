@@ -74,6 +74,7 @@ const getCharacter = async (id) => {
         delete data.intro.grid
                 
         const result = {
+            id: id,
             firstname: data.firstname,
             lastname: data.lastname,
             intro: data.intro,
@@ -95,7 +96,7 @@ const getCharactersList = async () => {
     try {
         const url = `${API}charactersList?lang=1`
         const res = await fetch(url)
-        const data = res.json()
+        const data = await res.json()
         return data
     } catch (error) {
         console.error('Error at fetching character list', error)
