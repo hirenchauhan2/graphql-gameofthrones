@@ -19,12 +19,17 @@ const {
 const { stripHTMLTags } = require('./util')
 
 const seasonsLoader = new DataLoader(keys => getSeasons)
+<<<<<<< HEAD
 const featuredCharsLoader = new DataLoader(keys =>
   Promise.all(keys.map(getFeaturedCharacters))
 )
 const characterLoader = new DataLoader(keys =>
   Promise.all(keys.map(getCharacter))
 )
+=======
+const featuredCharsLoader = new DataLoader(keys => Promise.all(keys.map(getFeaturedCharacters)))
+const characterLoader = new DataLoader(keys => Promise.all(keys.map(getCharacter)))
+>>>>>>> 3f05693834cd92b5f17e4c7482b6a8c697b1f330
 const characterListLoader = new DataLoader(keys => getCharactersList)
 
 // Season Type
@@ -56,7 +61,13 @@ const EpisodeType = new GraphQLObjectType({
     tunein_subtitle: { type: GraphQLString },
     featuredCharacters: {
       type: new GraphQLList(FeaturedCharacterType),
+<<<<<<< HEAD
       resolve: async data => await featuredCharsLoader.load(data.id)
+=======
+      resolve: async data => {
+        return await featuredCharsLoader.load(data.id)
+      }
+>>>>>>> 3f05693834cd92b5f17e4c7482b6a8c697b1f330
     }
   })
 })
@@ -103,7 +114,13 @@ const CharacterType = new GraphQLObjectType({
     id: { type: GraphQLInt },
     firstname: { type: GraphQLString },
     lastname: { type: GraphQLString },
+<<<<<<< HEAD
     intro: { type: CharacterIntroType },
+=======
+    intro: {
+      type: CharacterIntroType
+    },
+>>>>>>> 3f05693834cd92b5f17e4c7482b6a8c697b1f330
     bio: { type: GraphQLString },
     img: { type: GraphQLString },
     houses: { type: new GraphQLList(HouseShortType) }
