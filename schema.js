@@ -19,8 +19,12 @@ const {
 const { stripHTMLTags } = require('./util')
 
 const seasonsLoader = new DataLoader(keys => getSeasons)
-const featuredCharsLoader = new DataLoader(keys => Promise.all(keys.map(getFeaturedCharacters)))
-const characterLoader = new DataLoader(keys => Promise.all(keys.map(getCharacter)))
+const featuredCharsLoader = new DataLoader(keys =>
+  Promise.all(keys.map(getFeaturedCharacters))
+)
+const characterLoader = new DataLoader(keys =>
+  Promise.all(keys.map(getCharacter))
+)
 const characterListLoader = new DataLoader(keys => getCharactersList)
 
 // Season Type
@@ -30,9 +34,7 @@ const SeasonType = new GraphQLObjectType({
   fields: () => ({
     id: { type: GraphQLInt },
     season_number: { type: GraphQLInt },
-    episodes: {
-      type: new GraphQLList(EpisodeType)
-    }
+    episodes: { type: new GraphQLList(EpisodeType) }
   })
 })
 
@@ -54,9 +56,7 @@ const EpisodeType = new GraphQLObjectType({
     tunein_subtitle: { type: GraphQLString },
     featuredCharacters: {
       type: new GraphQLList(FeaturedCharacterType),
-      resolve: async data => {
-        return await featuredCharsLoader.load(data.id)
-      }
+      resolve: async data => await featuredCharsLoader.load(data.id)
     }
   })
 })
@@ -103,9 +103,7 @@ const CharacterType = new GraphQLObjectType({
     id: { type: GraphQLInt },
     firstname: { type: GraphQLString },
     lastname: { type: GraphQLString },
-    intro: {
-      type: CharacterIntroType
-    },
+    intro: { type: CharacterIntroType },
     bio: { type: GraphQLString },
     img: { type: GraphQLString },
     houses: { type: new GraphQLList(HouseShortType) }
@@ -127,20 +125,18 @@ const HouseShortType = new GraphQLObjectType({
 module.exports = new GraphQLSchema({
   query: new GraphQLObjectType({
     name: 'Query',
-    description: "Game of Thrones Viewer's guide GraphQL API",
+    description: 'Game of Thrones Viewer\'s guide GraphQL API',
     fields: () => ({
       allSeasons: {
         type: new GraphQLList(SeasonType),
-        resolve: async (root, args) => {
-          return await getSeasons()
-        }
+        resolve: async () => await getSeasons()
       },
       season: {
         type: SeasonType,
         args: {
           id: { type: GraphQLInt }
         },
-        resolve: async (root, { id }) => {
+        async resolve(root, { id }) {
           if (!id) {
             return await getSeasons()[0]
           }
